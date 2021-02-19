@@ -13,7 +13,7 @@ from asgiref.sync import async_to_sync
 from prometheus_client import CollectorRegistry, generate_latest
 from prometheus_client.core import GaugeMetricFamily
 
-from freeswitch_exporter.esl import ESL
+from my_freeswitch_exporter.esl import ESL
 
 
 class ESLProcessInfo():

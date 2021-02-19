@@ -4,7 +4,7 @@ FreeSWITCH exporter for the Prometheus monitoring system.
 
 import sys
 from argparse import ArgumentParser
-from freeswitch_exporter.http import start_http_server
+from my_freeswitch_exporter.http import start_http_server
 
 def main(args=None):
     """

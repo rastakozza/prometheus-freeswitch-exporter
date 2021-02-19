@@ -13,7 +13,7 @@ from werkzeug.routing import Map, Rule
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 
-from freeswitch_exporter.collector import collect_esl
+from my_freeswitch_exporter.collector import collect_esl
 
 
 class FreeswitchExporterApplication():
