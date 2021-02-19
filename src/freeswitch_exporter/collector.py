@@ -205,36 +205,60 @@ class ESLChannelInfo():
             'FreeSWITCH RTP channel info',
             labels=['id', 'name', 'user_agent'])
 
+        call_active_metric = GaugeMetricFamily(
+            'freeswitch_call_active',
+            'FreeSWITCH active number of calls.'
+        )
+
+        call_phantom_metric = GaugeMetricFamily(
+            'freeswitch_call_phantom',
+            'FreeSWITCH phantom number of calls.'
+        )
+
         millisecond_metrics = [
             'variable_rtp_audio_in_jitter_min_variance',
             'variable_rtp_audio_in_jitter_max_variance',
             'variable_rtp_audio_in_mean_interval',
         ]
 
+        active_calls = 0
+        phantom_calls = 0
         (_, result) = await self._esl.send('api show calls as json')
         for row in json.loads(result).get('rows', []):
             uuid = row['uuid']
 
             await self._esl.send(f'api uuid_set_media_stats {uuid}')
             (_, result) = await self._esl.send(f'api uuid_dump {uuid} json')
-            channelvars = json.loads(result)
 
-            label_values = [uuid]
-            for key, metric_value in channelvars.items():
-                if key in millisecond_metrics:
-                    metric_value = float(metric_value) / 1000.
-                if key in channel_metrics:
-                    channel_metrics[key].add_metric(
-                        label_values, metric_value)
+            try:
+                channelvars = json.loads(result)
 
-            user_agent = channelvars.get('variable_sip_user_agent', 'Unknown')
-            channel_info_label_values = [uuid, row['name'], user_agent]
-            channel_info_metric.add_metric(
-                channel_info_label_values, 1)
+                label_values = [uuid]
+                for key, metric_value in channelvars.items():
+                    if key in millisecond_metrics:
+                        metric_value = float(metric_value) / 1000.
+                    if key in channel_metrics:
+                        channel_metrics[key].add_metric(
+                            label_values, metric_value)
+
+                user_agent = channelvars.get('variable_sip_user_agent', 'Unknown')
+                channel_info_label_values = [uuid, row['name'], user_agent]
+                channel_info_metric.add_metric(
+                    channel_info_label_values, 1)
+                active_calls += 1
+
+            except ValueError:
+                phantom_calls += 1
+
+        call_active_metric.add_metric([], active_calls)
+        call_phantom_metric.add_metric([], phantom_calls)
 
         return itertools.chain(
             channel_metrics.values(),
-            [channel_info_metric])
+            [channel_info_metric,
+             call_active_metric,
+             call_phantom_metric]
+        )
 
 
 class ChannelCollector():
