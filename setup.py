@@ -5,8 +5,8 @@ from setuptools import setup
 setup(
     name="prometheus-my-freeswitch-exporter",
     version="0.1.0",
-    author="Marco Lanzotti"
-    author_email="marco@lanzotti.com"
+    author="Marco Lanzotti",
+    author_email="marco@lanzotti.com",
     description=("FreeSWITCH exporter for the Prometheus monitoring system based on Lorenz Schori prometheys-freeswitch-exporter."),
     long_description=codecs.open('README.rst', encoding='utf-8').read(),
     license="Apache Software License 2.0",
