@@ -119,6 +119,6 @@ class ESL():
 
         if "Content-Length" in headers:
             size = int(headers["Content-Length"])
-            result = (await self._in.readexactly(size)).decode()
+            result = (await self._in.readexactly(size)).decode(errors='replace')
 
         return result
